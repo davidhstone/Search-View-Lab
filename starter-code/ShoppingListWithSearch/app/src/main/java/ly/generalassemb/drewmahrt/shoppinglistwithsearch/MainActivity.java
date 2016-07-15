@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.items_layout);
+        setContentView(R.layout.activity_main);
         //  mCursorAdapter = null;
 
         //Ignore the two lines below, they are for setup
@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        };
 
-        SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, getListCursor, new String[]{ShoppingSQLiteOpenHelper.COL_ITEM_NAME}, new int[]{android.R.id.text1}, 0);
+        SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this, android.R.layout.
+                simple_list_item_1, getListCursor, new String[]{ShoppingSQLiteOpenHelper.
+                COL_ITEM_NAME}, new int[]{android.R.id.text1}, 0);
 
         mListView.setAdapter(simpleCursorAdapter);
 
@@ -105,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
                 public void bindView(View view, Context context, Cursor cursor) {
                     TextView item = (TextView) view.findViewById(R.id.item_text_view);
 
-//                    item.setText(cursor.getString(cursor.getColumnIndex(ShoppingSQLiteOpenHelper.COL_ITEM_NAME)));
-                    item.setText("Hey");
+                    item.setText(cursor.getString(cursor.getColumnIndex(ShoppingSQLiteOpenHelper.COL_ITEM_NAME)));
+//                    item.setText("Hey");
 
                 }
             };
