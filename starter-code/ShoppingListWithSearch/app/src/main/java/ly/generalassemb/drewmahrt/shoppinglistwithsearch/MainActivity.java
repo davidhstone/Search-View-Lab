@@ -26,6 +26,11 @@ public class MainActivity extends AppCompatActivity {
     //  private CursorAdapter mCursorAdapter;
 
     ListView mListView;
+  //  ListView mItemListView;
+    TextView mTextView;
+    CursorAdapter mCursorAdapter;
+    Cursor mCursor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +42,17 @@ public class MainActivity extends AppCompatActivity {
         DBAssetHelper dbSetup = new DBAssetHelper(MainActivity.this);
         dbSetup.getReadableDatabase();
 
-        Intent intent = new Intent(Intent.ACTION_SEARCH);
-        intent.putExtra(SearchManager.QUERY, "");
-        onNewIntent(intent);
+//        Intent intent = new Intent(Intent.ACTION_SEARCH);
+//        Intent intent = getIntent();
+//        intent.putExtra(SearchManager.QUERY, "");
+
+//        onNewIntent(getIntent());
 
         mListView = (ListView) findViewById(R.id.items_list_view);
+//        mTextView = (TextView) findViewById(R.id.item_text_view);
 
-        Cursor getListCursor = ShoppingSQLiteOpenHelper.getInstance(this).getShoppingList();
-//        Log.d("curosr", getListCursor.getCount()+"");
+        mCursor = ShoppingSQLiteOpenHelper.getInstance(this).getShoppingList();
+        Log.d("cursor", mCursor.getCount()+"");
 //
 //        android.support.v4.widget.CursorAdapter cursorAdapter = new android.support.v4.widget.CursorAdapter(this, getListCursor,
 //                android.support.v4.widget.CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER) {
@@ -64,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        };
 
-        SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this, android.R.layout.
-                simple_list_item_1, getListCursor, new String[]{ShoppingSQLiteOpenHelper.
+        mCursorAdapter = new SimpleCursorAdapter(this, android.R.layout.
+                simple_list_item_1, mCursor, new String[]{ShoppingSQLiteOpenHelper.
                 COL_ITEM_NAME}, new int[]{android.R.id.text1}, 0);
 
-        mListView.setAdapter(simpleCursorAdapter);
+        mListView.setAdapter(mCursorAdapter);
 
 
     }
@@ -80,24 +88,35 @@ public class MainActivity extends AppCompatActivity {
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        ComponentName componentName = new ComponentName(this, this.getClass());
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+//        ComponentName componentName = new ComponentName(this, this.getClass());
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;
 
     }
 
     protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
+        Log.d("MainActivity", "onNewIntent: yeah");
+//        super.onNewIntent(intent);
+        setIntent(intent);
+    //    setContentView(R.layout.activity_main);
 
-//        mListview = (ListView) findViewById(R.id.items_list_view);
+   //     mItemListView = (ListView) findViewById(R.id.item_list_view);
+        mTextView = (TextView) findViewById(R.id.item_text_view);
 
-        if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
+//        if (Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = getIntent().getStringExtra(SearchManager.QUERY);
-            Cursor searchCursor = ShoppingSQLiteOpenHelper.getInstance(this).searchItems(query);
+            if(query != null){
+                    Log.d("cursor2", query);
+            }
+            mCursor = ShoppingSQLiteOpenHelper.getInstance(this).searchItems(query);
+            Log.d("cursor2", mCursor.getCount()+"");
 
-            android.support.v4.widget.CursorAdapter cursorAdapter = new android.support.v4.widget.CursorAdapter(this, searchCursor,
-                    android.support.v4.widget.CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER) {
+
+
+            mCursorAdapter = new CursorAdapter(this, mCursor, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER) {
                 @Override
                 public View newView(Context context, Cursor cursor, ViewGroup parent) {
                     return LayoutInflater.from(MainActivity.this).inflate(R.layout.items_layout, parent, false);
@@ -105,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void bindView(View view, Context context, Cursor cursor) {
+                    //         ListView items = (ListView) view.findViewById(R.id.item_list_view);
                     TextView item = (TextView) view.findViewById(R.id.item_text_view);
 
                     item.setText(cursor.getString(cursor.getColumnIndex(ShoppingSQLiteOpenHelper.COL_ITEM_NAME)));
@@ -115,9 +135,9 @@ public class MainActivity extends AppCompatActivity {
             //           new String[]{ShoppingSQLiteOpenHelper.COL_ITEM_NAME},
             //         new int[]{R.id.item_text_view}, 0);
 
-//            mListview.setAdapter(cursorAdapter);
+            mCursorAdapter.changeCursor(mCursor);
+
+            mListView.setAdapter(mCursorAdapter);
         }
-
-
     }
 }
